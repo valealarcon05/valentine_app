@@ -1,0 +1,19 @@
+{
+    "name": "gestor-empresa",
+    "version": "1.0.0",
+    "description": "Aplicación para gestión de empleados y producción",
+    "main": "backend/server.js",
+    "scripts": {
+        "start": "node backend/server.js",
+        "test": "mocha --timeout 10000 test/*.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "sqlite3": "^5.1.2"
+    },
+    "devDependencies": {
+        "chai": "^5.1.2",
+        "chai-http": "^5.1.1",
+        "mocha": "^11.0.1"
+    }
+}

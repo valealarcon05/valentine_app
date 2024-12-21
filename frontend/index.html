@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Cocina</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <h1>Bienvenido a Valentine Cocina</h1>
+
+    <!-- Formulario para empleados -->
+    <section>
+        <h2>Acceso Usuarios</h2>
+        <form id="loginEmpleado">
+            <input type="text" id="empleadoID" placeholder="Ingrese su ID" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </section>
+
+    <!-- Botón para el dueño -->
+    <section>
+        <h2>Acceso Administrador</h2>
+        <button id="adminLogin">Iniciar Sesión</button>
+
+        <div id="formLoginAdmin" class="modal" style="display: none;">
+    <h2>Inicio de Sesión</h2>
+    <form id="formAdminLogin">
+        <label for="usuarioAdmin">Usuario:</label>
+        <input type="text" id="usuarioAdmin" required>
+
+        <label for="contraseñaAdmin">Contraseña:</label>
+        <input type="password" id="contraseñaAdmin" required>
+
+        <button type="submit">Iniciar Sesión</button>
+        <button type="button" id="cerrarFormLoginAdmin">Cancelar</button>
+    </form>
+        </div>
+
+    </section>
+
+    <script src="js/index.js"></script>
+</body>
+</html>
