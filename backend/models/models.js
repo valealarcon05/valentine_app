@@ -32,6 +32,8 @@ db.serialize(() => {
             id_producto INTEGER NOT NULL,
             cantidad INTEGER NOT NULL,
             fecha DATE NOT NULL,
+            sector TEXT NOT NULL,
+            rendimiento TEXT DEFAULT 'No evaluado', -- Nueva columna
             FOREIGN KEY (id_usuario) REFERENCES Usuarios (id),
             FOREIGN KEY (id_producto) REFERENCES Productos (id)
         )
@@ -66,6 +68,34 @@ db.serialize(() => {
             FOREIGN KEY (id_usuario) REFERENCES Usuarios(id),
             FOREIGN KEY (id_producto) REFERENCES Productos(id)
         )
+    `);
+    db.run(`
+            CREATE TRIGGER IF NOT EXISTS calcular_total
+            AFTER INSERT ON Ventas
+            BEGIN
+                UPDATE Ventas
+                SET total = (
+                    SELECT cantidad * Productos.precio_unitario
+                    FROM Productos
+                    WHERE Productos.id = NEW.id_producto
+                )
+                WHERE id = NEW.id;
+            END;
+    `);
+    db.run(`
+        CREATE TRIGGER IF NOT EXISTS verificar_rendimiento
+        AFTER INSERT ON Producción
+        BEGIN
+            UPDATE Producción
+            SET rendimiento = (
+                CASE
+                    WHEN (SELECT SUM(cantidad) FROM Ventas WHERE Ventas.id_producto = NEW.id_producto) >= (NEW.cantidad * 0.2)
+                    THEN 'Cumple'
+                    ELSE 'No cumple'
+                END
+            )
+            WHERE id = NEW.id;
+        END;
     `);
 });
 

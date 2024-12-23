@@ -34,5 +34,7 @@ router.put('/materia-prima/:id', apiController.editarMateriaPrima);
 // Estadísticas
 router.get('/estadisticas', apiController.obtenerEstadisticas);
 router.get('/ingresos', apiController.obtenerIngresos);
+router.get('/produccion/rendimiento', apiController.calcularRendimiento);
+
 
 module.exports = router;

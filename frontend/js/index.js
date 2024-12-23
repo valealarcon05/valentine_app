@@ -10,12 +10,7 @@ document.getElementById("loginEmpleado").addEventListener("submit", (e) => {
     }
 });
 
-// Redirección para el dueño desde el botón
-document.getElementById("adminLogin").addEventListener("click", () => {
-    window.location.href = "/dashboard-admin.html";
-});
-
-// Mostrar formulario de login
+// Mostrar formulario de login de administrador
 document.getElementById("adminLogin").addEventListener("click", () => {
     document.getElementById("formLoginAdmin").style.display = "block";
 });
@@ -25,7 +20,7 @@ document.getElementById("cerrarFormLoginAdmin").addEventListener("click", () => 
     document.getElementById("formLoginAdmin").style.display = "none";
 });
 
-// Verificar credenciales del administrador
+// Verificar credenciales del administrador y redirigir si son correctas
 document.getElementById("formAdminLogin").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -41,7 +36,6 @@ document.getElementById("formAdminLogin").addEventListener("submit", async (e) =
 
         if (response.ok) {
             localStorage.setItem("adminLoggedIn", "true");
-            alert("Inicio de sesión exitoso.");
             window.location.href = "/dashboard-admin.html";
         } else {
             alert("Credenciales incorrectas.");
@@ -51,8 +45,8 @@ document.getElementById("formAdminLogin").addEventListener("submit", async (e) =
     }
 });
 
+// Redirigir automáticamente si el administrador ya está logueado
 document.addEventListener("DOMContentLoaded", () => {
-    // Si el administrador ya está logueado, redirigir al dashboard
     if (localStorage.getItem("adminLoggedIn") === "true") {
         window.location.href = "/dashboard-admin.html";
     }

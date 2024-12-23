@@ -7,9 +7,9 @@ const db = new sqlite3.Database(dbPath);
 
 // Producción
 exports.crearProduccion = (req, res) => {
-    const { id_usuario, id_producto, cantidad, fecha } = req.body;
-    const query = `INSERT INTO Producción (id_usuario, id_producto, cantidad, fecha) VALUES (?, ?, ?, ?)`;
-    db.run(query, [id_usuario, id_producto, cantidad, fecha], function (err) {
+    const { id_usuario, id_producto, cantidad, fecha, sector } = req.body;
+    const query = `INSERT INTO Producción (id_usuario, id_producto, cantidad, fecha, sector) VALUES (?, ?, ?, ?)`;
+    db.run(query, [id_usuario, id_producto, cantidad, fecha, sector], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -19,7 +19,19 @@ exports.crearProduccion = (req, res) => {
 
 exports.obtenerProduccionPorEmpleado = (req, res) => {
     const { id } = req.params;
-    const query = `SELECT * FROM Producción WHERE id_usuario = ?`;
+    if (!id || isNaN(id)) {
+        return res.status(400).json({ error: "ID de usuario inválido." });
+    }
+    const query = `
+        SELECT 
+            Producción.id,
+            Producción.id_usuario,
+            Productos.nombre AS nombre_producto,
+            Producción.cantidad,
+            Producción.fecha
+        FROM Producción
+        INNER JOIN Productos ON Producción.id_producto = Productos.id
+        WHERE Producción.id_usuario = ?`;
     db.all(query, [id], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -182,6 +194,38 @@ exports.obtenerIngresos = (req, res) => {
     res.json(ingresos);
 };
 
+exports.calcularRendimiento = (req, res) => {
+    const query = `
+        SELECT 
+            Productos.nombre AS producto,
+            SUM(Producción.cantidad) AS total_producido,
+            SUM(Ventas.cantidad) AS total_vendido,
+            (SUM(Ventas.cantidad) * 100.0 / SUM(Producción.cantidad)) AS rendimiento
+        FROM Producción
+        LEFT JOIN Ventas ON Producción.id_producto = Ventas.id_producto
+        JOIN Productos ON Producción.id_producto = Productos.id
+        GROUP BY Productos.id
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error al calcular rendimiento:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+
+        const resultados = rows.map((row) => ({
+            producto: row.producto,
+            total_producido: row.total_producido,
+            total_vendido: row.total_vendido,
+            rendimiento: row.rendimiento ? `${row.rendimiento.toFixed(2)}%` : 'N/A',
+            dentro_del_objetivo: row.rendimiento >= 20 ? 'Sí' : 'No'
+        }));
+
+        res.json(resultados);
+    });
+};
+
+
 // Crear Producto
 exports.crearProducto = (req, res) => {
     const { nombre, precio, sector } = req.body;
@@ -212,9 +256,9 @@ exports.listarProductos = (req, res) => {
 exports.editarProducto = (req, res) => {
     const { id } = req.params;
     const { nombre, precio, sector } = req.body;
-    if (!nombre || !precio || !sector) {
-        return res.status(400).json({ error: "Todos los campos (nombre, precio, sector) son obligatorios." });
-    }
+    //if (!nombre || !precio || !sector) {
+    //    return res.status(400).json({ error: "Todos los campos (nombre, precio, sector) son obligatorios." });
+    //}
 
     const query = `UPDATE Productos SET nombre = ?, precio_unitario = ?, sector = ? WHERE id = ?`;
     db.run(query, [nombre, precio, sector, id], function (err) {

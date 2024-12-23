@@ -1,0 +1,16 @@
+body{
+    background-color: rgb(196, 29, 29);
+    font-family: Arial, sans-serif, white;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.btn {
+    margin: 5px;
+}

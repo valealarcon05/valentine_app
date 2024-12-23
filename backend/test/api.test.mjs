@@ -2,7 +2,9 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../server.js';
 
-const { expect } = chai.expect;
+const { expect } = chai;
+const { request } = chai;
+
 chai.use(chaiHttp);
 
 describe('Pruebas de API', () => {
@@ -15,7 +17,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Usuarios', () => {
     it('Debe crear un usuario', (done) => {
-      chai.request(app)
+      request(app)
         .post('/api/usuarios')
         .send({ nombre: 'Usuario Prueba', rol: 'empleado', contraseña: '123456' })
         .end((err, res) => {
@@ -28,7 +30,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe listar todos los usuarios', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/usuarios')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -38,7 +40,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe editar un usuario', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .put(`/api/usuarios/${usuarioId}`)
         .send({ nombre: 'Usuario Actualizado', rol: 'dueño', contraseña: '654321' })
         .end((err, res) => {
@@ -49,7 +51,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe eliminar un usuario', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .delete(`/api/usuarios/${usuarioId}`)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -64,7 +66,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Productos', () => {
     it('Debe crear un producto', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .post('/api/productos')
         .send({ nombre: 'Producto Prueba', precio: 10.5, sector: 'congelados' })
         .end((err, res) => {
@@ -77,7 +79,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe listar todos los productos', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/productos')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -87,7 +89,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe editar un producto', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .put(`/api/productos/${productoId}`)
         .send({ nombre: 'Producto Actualizado', precio: 15.0, sector: 'parrilla' })
         .end((err, res) => {
@@ -98,7 +100,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe eliminar un producto', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .delete(`/api/productos/${productoId}`)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -113,7 +115,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Producción', () => {
     it('Debe registrar producción', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .post('/api/produccion')
         .send({ id_usuario: 1, id_producto: 1, cantidad: 100, fecha: '2024-12-21' })
         .end((err, res) => {
@@ -124,7 +126,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe listar la producción general', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/produccion')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -139,7 +141,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Ventas', () => {
     it('Debe registrar una venta', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .post('/api/ventas')
         .send({
           id_usuario: 1,
@@ -156,7 +158,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe listar todas las ventas', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/ventas')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -171,7 +173,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Materia Prima', () => {
     it('Debe registrar materia prima', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .post('/api/materia-prima')
         .send({ nombre: 'Carne', precio: 100, cantidad: 50 })
         .end((err, res) => {
@@ -184,7 +186,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe listar toda la materia prima', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/materia-prima')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -194,7 +196,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe editar materia prima', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .put(`/api/materia-prima/${materiaPrimaId}`)
         .send({ nombre: 'Carne Actualizada', precio: 120, cantidad: 60 })
         .end((err, res) => {
@@ -210,7 +212,7 @@ describe('Pruebas de API', () => {
   // -----------------------------------------
   describe('Estadísticas', () => {
     it('Debe obtener estadísticas de rendimiento', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/estadisticas')
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -220,7 +222,7 @@ describe('Pruebas de API', () => {
     });
 
     it('Debe obtener ingresos por sector', (done) => {
-      chai.request(app)
+      chai.request.execute(app)
         .get('/api/ingresos')
         .end((err, res) => {
           expect(res).to.have.status(200);
