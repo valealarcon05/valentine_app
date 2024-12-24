@@ -25,8 +25,8 @@ document.getElementById("btnAgregarProduccion").addEventListener("click", () => 
                         <div class="mb-3">
                             <label for="productoProduccion" class="form-label">Producto:</label>
                             <select id="productoProduccion" class="form-select">
-                                <option value="empanada">Empanada</option>
-                                <option value="pollo">Pollo</option>
+                                <option value="1">Empanada</option>
+                                <option value="2">Pollo</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -64,11 +64,12 @@ document.getElementById("btnAgregarProduccion").addEventListener("click", () => 
             const response = fetch("/api/produccion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_usuario: empleadoID, producto, cantidad, fecha, sector }),
+                body: JSON.stringify({ id_usuario: empleadoID, id_producto: producto, cantidad: cantidad, fecha: fecha, sector }),
             });
 
             if (response.ok) {
                 alert("Producción registrada con éxito.");
+                document.getElementById("formProduccion").style.display = "none";
                 cargarProduccionEmpleado(empleadoID);
             } else {
                 alert("Error al registrar la producción.");
@@ -101,8 +102,8 @@ document.getElementById("btnAgregarVenta").addEventListener("click", () => {
                         <div class="mb-3">
                             <label for="productoVenta" class="form-label">Producto:</label>
                             <select id="productoVenta" class="form-select">
-                                <option value="empanada">Empanada</option>
-                                <option value="pollo">Pollo</option>
+                                <option value="1">Empanada</option>
+                                <option value="2">Pollo</option>
                             </select>
                         </div>
                         <div class="mb-3">

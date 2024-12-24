@@ -8,6 +8,9 @@ const db = new sqlite3.Database(dbPath);
 // Producción
 exports.crearProduccion = (req, res) => {
     const { id_usuario, id_producto, cantidad, fecha, sector } = req.body;
+    if (!id_usuario || !id_producto || !cantidad) {
+    return res.status(400).json({ error: "Faltan campos obligatorios: id_usuario, id_producto o cantidad." });
+}
     const query = `INSERT INTO Producción (id_usuario, id_producto, cantidad, fecha, sector) VALUES (?, ?, ?, ?)`;
     db.run(query, [id_usuario, id_producto, cantidad, fecha, sector], function (err) {
         if (err) {
@@ -17,22 +20,21 @@ exports.crearProduccion = (req, res) => {
     });
 };
 
-exports.obtenerProduccionPorEmpleado = (req, res) => {
-    const { id } = req.params;
-    if (!id || isNaN(id)) {
-        return res.status(400).json({ error: "ID de usuario inválido." });
-    }
+exports.obtenerProduccionUsuarios = (req, res) => {
     const query = `
         SELECT 
-            Producción.id,
             Producción.id_usuario,
+            Usuarios.nombre AS nombre_usuario,
             Productos.nombre AS nombre_producto,
             Producción.cantidad,
-            Producción.fecha
+            Producción.fecha,
+            Producción.sector
         FROM Producción
         INNER JOIN Productos ON Producción.id_producto = Productos.id
-        WHERE Producción.id_usuario = ?`;
-    db.all(query, [id], (err, rows) => {
+        INNER JOIN Usuarios ON Producción.id_usuario = Usuarios.id;
+    `;
+
+    db.all(query, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -317,5 +319,48 @@ exports.editarMateriaPrima = (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         res.json({ message: 'Materia prima actualizada' });
+    });
+};
+
+exports.obtenerProduccionUsuarios = (req, res) => {
+    const query = `
+        SELECT 
+            p.id_usuario,
+            u.nombre AS nombre_usuario,
+            pr.nombre AS nombre_producto,
+            p.fecha,
+            p.cantidad,
+            p.sector
+        FROM Producción p
+        JOIN Usuarios u ON u.id = p.id_usuario
+        JOIN Productos pr ON pr.id = p.id_producto;
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+};
+
+exports.obtenerResumenUsuarios = (req, res) => {
+    const query = `
+        SELECT 
+            u.id AS id_usuario,
+            u.nombre AS nombre_usuario,
+            u.rol AS rol_usuario,
+            u.fecha_creacion,
+            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'ingreso'), 'N/A') AS ultimo_ingreso,
+            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'salida'), 'N/A') AS ultima_salida,
+            COALESCE((SELECT SUM(v.total) FROM Ventas v WHERE v.id_usuario = u.id), 0) AS suma_ventas
+        FROM Usuarios u;
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
     });
 };

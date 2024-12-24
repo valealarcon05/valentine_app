@@ -1,251 +1,143 @@
-// Cargar la producción de todos los usuarios
-async function cargarProduccionUsuarios() {
-    try {
-        const response = await fetch('/api/produccion');
-        const produccion = await response.json();
+document.addEventListener('DOMContentLoaded', () => {
+    const modalUsuarios = document.getElementById('modalGestionUsuarios');
+    const modalProductos = document.getElementById('modalGestionProductos');
+    const modalMateriaPrima = document.getElementById('modalGestionMateriaPrima');
 
-        const tabla = document.getElementById('tablaProduccion').querySelector('tbody');
-        tabla.innerHTML = ''; // Limpiar tabla
+    // Botones para abrir y cerrar modales
+    document.getElementById('btnGestionUsuarios').addEventListener('click', () => {
+        modalUsuarios.style.display = 'block';
+    });
 
-        produccion.forEach((item) => {
-            const fila = tabla.insertRow();
-            fila.insertCell(0).innerText = item.nombre_usuario; // Nombre del usuario
-            fila.insertCell(1).innerText = item.nombre_producto; // Nombre del producto
-            fila.insertCell(2).innerText = item.cantidad;
-            fila.insertCell(3).innerText = item.fecha.split('T')[0]; // Fecha
-            fila.insertCell(4).innerText = item.fecha.split('T')[1].slice(0, 5); // Hora
-        });
-    } catch (error) {
-        console.error('Error al cargar la producción de los usuarios:', error);
-    }
-}
+    document.getElementById('cerrarModalUsuarios').addEventListener('click', () => {
+        modalUsuarios.style.display = 'none';
+    });
 
-// Cargar producción al cargar la página
-cargarProduccionUsuarios();
+    document.getElementById('btnGestionProductos').addEventListener('click', () => {
+        modalProductos.style.display = 'block';
+    });
 
-// Botones de Gestión
-document.getElementById('btnGestionUsuarios').addEventListener('click', () => {
-    alert('Abrir formulario de gestión de usuarios.');
-    // Aquí puedes implementar la lógica para abrir un modal o redirigir a otra página.
-});
+    document.getElementById('cerrarModalProductos').addEventListener('click', () => {
+        modalProductos.style.display = 'none';
+    });
 
-document.getElementById('btnGestionProductos').addEventListener('click', () => {
-    alert('Abrir formulario de gestión de productos.');
-    // Implementa la lógica para abrir un modal o redirigir a otra página.
-});
+    document.getElementById('btnGestionMateriaPrima').addEventListener('click', () => {
+        modalMateriaPrima.style.display = 'block';
+    });
 
-document.getElementById('btnGestionMateriaPrima').addEventListener('click', () => {
-    alert('Abrir formulario de gestión de materia prima.');
-    // Implementa la lógica para abrir un modal o redirigir a otra página.
-});
+    document.getElementById('cerrarModalMateriaPrima').addEventListener('click', () => {
+        modalMateriaPrima.style.display = 'none';
+    });
 
-// Estadísticas: Placeholder (puedes integrar gráficos con Chart.js o similar)
-async function cargarEstadisticas() {
-    try {
-        // Simulación de datos estadísticos (deberían venir del backend)
-        const estadisticas = [
-            { producto: 'Hamburguesas', rendimiento: 22 },
-            { producto: 'Papas Fritas', rendimiento: 24 },
-            { producto: 'Pollo', rendimiento: 20 },
-        ];
+    // Cerrar modal al hacer clic en el botón Cancelar dentro del formulario
+    document.querySelector('#formGestionUsuarios button.btn-secondary').addEventListener('click', () => {
+        modalUsuarios.style.display = 'none';
+    });
 
-        const tablaEstadisticas = document.getElementById('tablaEstadisticas').querySelector('tbody');
-        tablaEstadisticas.innerHTML = ''; // Limpiar tabla
+    document.querySelector('#formGestionProductos button.btn-secondary').addEventListener('click', () => {
+        modalProductos.style.display = 'none';
+    });
 
-        estadisticas.forEach((item) => {
-            const fila = tablaEstadisticas.insertRow();
-            fila.insertCell(0).innerText = item.producto;
-            fila.insertCell(1).innerText = `${item.rendimiento}%`;
-        });
-    } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
-    }
-}
+    document.querySelector('#formGestionMateriaPrima button.btn-secondary').addEventListener('click', () => {
+        modalMateriaPrima.style.display = 'none';
+    });
 
-// Cargar estadísticas al cargar la página
-cargarEstadisticas();
+    // Cargar datos para la tabla Producción por Usuario
+    async function cargarDatosTablaProduccion() {
+        try {
+            const response = await fetch('/api/produccion');
+            const datos = await response.json();
 
-// Cargar estadísticas de rendimiento
-async function cargarGraficoRendimiento() {
-    try {
-        const response = await fetch('/api/estadisticas'); // Ruta para estadísticas
-        const estadisticas = await response.json();
+            const tablaProduccion = document.getElementById('tablaProduccion').querySelector('tbody');
+            tablaProduccion.innerHTML = '';
 
-        const ctxRendimiento = document.getElementById('graficoRendimiento').getContext('2d');
-        new Chart(ctxRendimiento, {
-            type: 'bar',
-            data: {
-                labels: estadisticas.map((item) => item.producto),
-                datasets: [{
-                    label: 'Rendimiento (%)',
-                    data: estadisticas.map((item) => item.rendimiento),
-                    backgroundColor: ['#4caf50', '#2196f3', '#ff5722'], // Colores de las barras
-                }],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { enabled: true },
-                },
-                scales: {
-                    y: { beginAtZero: true },
-                },
-            },
-        });
-    } catch (error) {
-        console.error('Error al cargar el gráfico de rendimiento:', error);
-    }
-}
-
-cargarGraficoRendimiento();
-
-// Cargar gráfico de ingresos por sectores
-async function cargarGraficoIngresos() {
-    try {
-        // Simulación de datos: Esto debería venir del backend
-        const ingresos = [
-            { sector: 'Congelados', total: 5000 },
-            { sector: 'Cantina', total: 3000 },
-            { sector: 'Parrilla', total: 7000 },
-        ];
-
-        const ctxIngresos = document.getElementById('graficoIngresos').getContext('2d');
-        new Chart(ctxIngresos, {
-            type: 'pie',
-            data: {
-                labels: ingresos.map((item) => item.sector),
-                datasets: [{
-                    label: 'Ingresos ($)',
-                    data: ingresos.map((item) => item.total),
-                    backgroundColor: ['#f44336', '#3f51b5', '#ffc107'], // Colores de los sectores
-                }],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true, position: 'top' },
-                    tooltip: { enabled: true },
-                },
-            },
-        });
-    } catch (error) {
-        console.error('Error al cargar el gráfico de ingresos:', error);
-    }
-}
-
-cargarGraficoIngresos();
-
-document.getElementById("btnCerrarSesionAdmin").addEventListener("click", () => {
-    localStorage.removeItem("adminLoggedIn");
-    alert("Sesión cerrada.");
-    window.location.href = "/"; // Redirige al index
-});
-
-// Mostrar modal de gestión de usuarios
-document.getElementById('btnGestionUsuarios').addEventListener('click', () => {
-    document.getElementById('modalGestionUsuarios').style.display = 'block';
-});
-
-// Cerrar modal de gestión de usuarios
-document.getElementById('cerrarModalUsuarios').addEventListener('click', () => {
-    document.getElementById('modalGestionUsuarios').style.display = 'none';
-});
-
-// Mostrar modal de gestión de productos
-document.getElementById('btnGestionProductos').addEventListener('click', () => {
-    document.getElementById('modalGestionProductos').style.display = 'block';
-});
-
-// Cerrar modal de gestión de productos
-document.getElementById('cerrarModalProductos').addEventListener('click', () => {
-    document.getElementById('modalGestionProductos').style.display = 'none';
-});
-
-// Mostrar modal de gestión de materia prima
-document.getElementById('btnGestionMateriaPrima').addEventListener('click', () => {
-    document.getElementById('modalGestionMateriaPrima').style.display = 'block';
-});
-
-// Cerrar modal de gestión de materia prima
-document.getElementById('cerrarModalMateriaPrima').addEventListener('click', () => {
-    document.getElementById('modalGestionMateriaPrima').style.display = 'none';
-});
-
-// Enviar datos de usuarios al servidor
-document.getElementById('formGestionUsuarios').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const nombre = document.getElementById('nombreUsuario').value;
-    const rol = document.getElementById('rolUsuario').value;
-    const contraseña = document.getElementById('contraseñaUsuario').value;
-
-    try {
-        const response = await fetch('/api/usuarios', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, rol, contraseña }),
-        });
-
-        if (response.ok) {
-            alert('Usuario registrado con éxito.');
-            document.getElementById('modalGestionUsuarios').style.display = 'none';
-        } else {
-            alert('Error al registrar el usuario.');
+            datos.forEach(prod => {
+                const fila = tablaProduccion.insertRow();
+                fila.insertCell(0).innerText = prod.id_usuario;
+                fila.insertCell(1).innerText = prod.nombre_usuario;
+                fila.insertCell(2).innerText = prod.nombre_producto;
+                fila.insertCell(3).innerText = prod.fecha;
+                fila.insertCell(4).innerText = prod.cantidad;
+            });
+        } catch (error) {
+            console.error('Error al cargar datos de producción:', error);
         }
-    } catch (error) {
-        console.error('Error al registrar usuario:', error);
     }
-});
 
-// Enviar datos de productos al servidor
-document.getElementById('formGestionProductos').addEventListener('submit', async (e) => {
-    e.preventDefault();
+    // Cargar datos para la tabla Registro Usuarios
+    async function cargarDatosTablaUsuarios() {
+        try {
+            const response = await fetch('/api/usuarios');
+            const datos = await response.json();
 
-    const nombre = document.getElementById('nombreProducto').value;
-    const precio = document.getElementById('precioProducto').value;
-    const sector = document.getElementById('sectorProducto').value;
+            const tablaUsuarios = document.getElementById('tablaUsuarios').querySelector('tbody');
+            tablaUsuarios.innerHTML = '';
 
-    try {
-        const response = await fetch('/api/productos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, precio, sector }),
-        });
-
-        if (response.ok) {
-            alert('Producto registrado con éxito.');
-            document.getElementById('modalGestionProductos').style.display = 'none';
-        } else {
-            alert('Error al registrar el producto.');
+            datos.forEach(usuario => {
+                const fila = tablaUsuarios.insertRow();
+                fila.insertCell(0).innerText = usuario.id_usuario;
+                fila.insertCell(1).innerText = usuario.nombre_usuario;
+                fila.insertCell(2).innerText = usuario.fecha_creacion;
+                fila.insertCell(3).innerText = usuario.ultimo_ingreso;
+                fila.insertCell(4).innerText = usuario.ultima_salida;
+                fila.insertCell(5).innerText = `$${usuario.suma_ventas}`;
+            });
+        } catch (error) {
+            console.error('Error al cargar datos de usuarios:', error);
         }
-    } catch (error) {
-        console.error('Error al registrar producto:', error);
     }
-});
 
-// Enviar datos de materia prima al servidor
-document.getElementById('formGestionMateriaPrima').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const nombre = document.getElementById('nombreMateriaPrima').value;
-    const precio = document.getElementById('precioMateriaPrima').value;
-    const cantidad = document.getElementById('cantidadMateriaPrima').value;
-
-    try {
-        const response = await fetch('/api/materia-prima', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, precio, cantidad }),
-        });
-
-        if (response.ok) {
-            alert('Materia prima registrada con éxito.');
-            document.getElementById('modalGestionMateriaPrima').style.display = 'none';
-        } else {
-            alert('Error al registrar la materia prima.');
+    // Gráficos con Chart.js
+    const ctxRendimiento = document.getElementById('graficoRendimiento').getContext('2d');
+    const graficoRendimiento = new Chart(ctxRendimiento, {
+        type: 'bar',
+        data: {
+            labels: ['Cantina', 'Congelados', 'Parrilla'],
+            datasets: [{
+                label: '% Rendimiento',
+                data: [70, 85, 90], // Datos simulados
+                backgroundColor: ['#007bff', '#28a745', '#ffc107']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
         }
-    } catch (error) {
-        console.error('Error al registrar materia prima:', error);
-    }
+    });
+
+    const ctxIngresos = document.getElementById('graficoIngresos').getContext('2d');
+    const graficoIngresos = new Chart(ctxIngresos, {
+        type: 'pie',
+        data: {
+            labels: ['Cantina', 'Congelados', 'Parrilla'],
+            datasets: [{
+                label: 'Ingresos ($)',
+                data: [3000, 5000, 7000], // Datos simulados
+                backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { enabled: true }
+            }
+        }
+    });
+
+    // Inicializar datos al cargar la página
+    cargarDatosTablaProduccion();
+    cargarDatosTablaUsuarios();
+
+    // Cerrar sesión
+    document.getElementById('btnCerrarSesionAdmin').addEventListener('click', () => {
+        localStorage.removeItem('adminLoggedIn'); // Eliminar flag de sesión
+        alert('Sesión cerrada');
+        window.location.href = '/';
+    });
 });

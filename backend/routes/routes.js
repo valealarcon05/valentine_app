@@ -19,7 +19,8 @@ router.delete('/productos/:id', apiController.eliminarProducto);
 // Producción
 router.post('/produccion', apiController.crearProduccion);
 router.get('/produccion', apiController.obtenerProduccionGeneral);
-router.get('/produccion/:id', apiController.obtenerProduccionPorEmpleado);
+router.get('/api/produccion', apiController.obtenerProduccionUsuarios);
+router.get('/api/produccion/:id', api.obtenerProduccionPorEmpleado);
 
 // Ventas
 router.get('/ventas/:id', apiController.obtenerVentasPorEmpleado);

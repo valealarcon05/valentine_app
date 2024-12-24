@@ -92,10 +92,6 @@ Express.js: Crear API REST para manejar el CRUD.
 Middleware: Usar autenticación básica (por ejemplo, JWT para el dueño).
 Rutas protegidas: Limitar acceso a datos sensibles al dueño.
 
-21/12/24: hice hasta insomnia, queda arreglar 3 solicitudes:
-editar producto y materia prima error 404 bad request y para consultar ventas por usuario errpr 500 internal server error
-22/12/24:
-arreglar lo de insomnia, intentè hacer por api.test.mjs con mocha y chai pero se complica, asi que verificarè los 3 solicitudes q faltancc con insomnia. las pude solucionar
 2. Configurar el Frontend
 index.html: Configura el formulario para que los usuarios puedan ingresar o acceder como administrador.
 Implementa los fetch API para interactuar con las rutas /api/login y /api/usuarios.
@@ -117,3 +113,8 @@ Si todo funciona correctamente, puedes:
 Agregar autenticación JWT para proteger las rutas.
 Crear un script de inicialización de base de datos para automatizar la creación de tablas.
 Implementar pruebas automatizadas con Mocha y Chai. (a medio hacer, verificar esto)
+
+21/12/24: hice hasta insomnia, queda arreglar 3 solicitudes:
+editar producto y materia prima error 404 bad request y para consultar ventas por usuario errpr 500 internal server error
+22/12/24:
+arreglar lo de insomnia, intentè hacer por api.test.mjs con mocha y chai pero se complica, asi que verificarè los 3 solicitudes q faltancc con insomnia. las pude solucionar
