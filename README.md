@@ -118,3 +118,6 @@ Implementar pruebas automatizadas con Mocha y Chai. (a medio hacer, verificar es
 editar producto y materia prima error 404 bad request y para consultar ventas por usuario errpr 500 internal server error
 22/12/24:
 arreglar lo de insomnia, intentè hacer por api.test.mjs con mocha y chai pero se complica, asi que verificarè los 3 solicitudes q faltancc con insomnia. las pude solucionar
+23/12/24:
+prueba de curl /api/productos/1 y usuarios, falta comprobar
+24/12/24: se comprobaron pero no dieron
