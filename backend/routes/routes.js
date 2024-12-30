@@ -2,40 +2,39 @@ const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/api');
 
-// Usuarios
-router.post('/usuarios', apiController.crearUsuario);
-router.get('/usuarios', apiController.listarUsuarios);
-router.put('/usuarios/:id', apiController.editarUsuario);
-router.delete('/usuarios/:id', apiController.eliminarUsuario);
-router.post('/admin/login', apiController.verificarAdmin);
-
-
-// Productos
-router.post('/productos', apiController.crearProducto);
-router.get('/productos', apiController.listarProductos);
-router.put('/productos/:id', apiController.editarProducto);
-router.delete('/productos/:id', apiController.eliminarProducto);
-
 // Producción
-router.post('/produccion', apiController.crearProduccion);
-router.get('/produccion', apiController.obtenerProduccionGeneral);
-router.get('/api/produccion', apiController.obtenerProduccionUsuarios);
-router.get('/api/produccion/:id', api.obtenerProduccionPorEmpleado);
+router.post('/api/produccion', apiController.crearProduccion);
+router.get('/api/produccion', apiController.obtenerProduccionPorEmpleado);
+router.get('/api/produccion/general', apiController.obtenerProduccionGeneral);
+router.get('/api/produccion/:id',apiController.obtenerProduccionUsuarios);
 
 // Ventas
-router.get('/ventas/:id', apiController.obtenerVentasPorEmpleado);
-router.post('/ventas', apiController.crearVenta);
-router.get('/ventas', apiController.obtenerVentasGeneral);
+router.post('/api/ventas', apiController.crearVenta);
+router.get('/api/ventas', apiController.obtenerVentasGeneral);
+router.get('/api/ventas/:id', apiController.obtenerVentasPorEmpleado);
 
-// Materia Prima
-router.post('/materia-prima', apiController.crearMateriaPrima);
-router.get('/materia-prima', apiController.listarMateriaPrima);
-router.put('/materia-prima/:id', apiController.editarMateriaPrima);
+// Usuarios
+router.post('/api/usuarios', apiController.crearUsuario);
+router.get('/api/usuarios', apiController.listarUsuarios);
+router.put('/api/usuarios/:id', apiController.editarUsuario);
+router.delete('/api/usuarios/:id', apiController.eliminarUsuario);
+router.post('/api/usuarios/verificar-admin', apiController.verificarAdmin);
+router.get('/api/usuarios/resumen', apiController.obtenerResumenUsuarios);
 
 // Estadísticas
-router.get('/estadisticas', apiController.obtenerEstadisticas);
-router.get('/ingresos', apiController.obtenerIngresos);
-router.get('/produccion/rendimiento', apiController.calcularRendimiento);
+router.get('/api/estadisticas', apiController.obtenerEstadisticas);
+router.get('/api/ingresos', apiController.obtenerIngresos);
+router.get('/api/rendimiento', apiController.calcularRendimiento);
 
+// Productos
+router.post('/api/productos', apiController.crearProducto);
+router.get('/api/productos', apiController.listarProductos);
+router.put('/api/productos/:id', apiController.editarProducto);
+router.delete('/api/productos/:id', apiController.eliminarProducto);
+
+// Materia Prima
+router.post('/api/materia-prima', apiController.crearMateriaPrima);
+router.get('/api/materia-prima', apiController.listarMateriaPrima);
+router.put('/api/materia-prima/:id', apiController.editarMateriaPrima);
 
 module.exports = router;

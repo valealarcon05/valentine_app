@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const open = require('sqlite');
 
 // Generar una ruta absoluta
 const dbPath = path.join(__dirname, '../db/empresa.db');
@@ -20,7 +21,7 @@ exports.crearProduccion = (req, res) => {
     });
 };
 
-exports.obtenerProduccionUsuarios = (req, res) => {
+exports.obtenerProduccionPorEmpleado = (req, res) => {
     const query = `
         SELECT 
             Producción.id_usuario,
@@ -53,27 +54,6 @@ exports.obtenerProduccionGeneral = (req, res) => {
 };
 
 // Ventas
-exports.obtenerVentasPorEmpleado = (req, res) => {
-    const { id } = req.params;
-
-    const query = `
-        SELECT Productos.nombre AS nombre_producto, Ventas.cantidad, Ventas.total, Ventas.fecha, Ventas.sector
-        FROM Ventas
-        JOIN Productos ON Ventas.id_producto = Productos.id
-        WHERE Ventas.id_usuario = ?
-    `;
-
-    db.all(query, [id], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (rows.length) {
-            return res.status(404).json({ error: "No se encontraron ventas para este usuario." });
-        }
-        res.json(rows);
-    });
-};
-
 exports.crearVenta = (req, res) => {
     const { id_usuario, id_producto, cantidad, fecha, sector } = req.body;
 
@@ -100,6 +80,27 @@ exports.obtenerVentasGeneral = (req, res) => {
     db.all(query, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+};
+
+exports.obtenerVentasPorEmpleado = (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT Productos.nombre AS nombre_producto, Ventas.cantidad, Ventas.total, Ventas.fecha, Ventas.sector
+        FROM Ventas
+        JOIN Productos ON Ventas.id_producto = Productos.id
+        WHERE Ventas.id_usuario = ?
+    `;
+
+    db.all(query, [id], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (rows.length) {
+            return res.status(404).json({ error: "No se encontraron ventas para este usuario." });
         }
         res.json(rows);
     });
@@ -172,6 +173,26 @@ exports.verificarAdmin = (req, res) => {
     }
 };
 
+exports.obtenerResumenUsuarios = (req, res) => {
+    const query = `
+        SELECT 
+            u.id AS id_usuario,
+            u.nombre AS nombre_usuario,
+            u.rol AS rol_usuario,
+            u.fecha_creacion,
+            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'ingreso'), 'N/A') AS ultimo_ingreso,
+            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'salida'), 'N/A') AS ultima_salida,
+            COALESCE((SELECT SUM(v.total) FROM Ventas v WHERE v.id_usuario = u.id), 0) AS suma_ventas
+        FROM Usuarios u;
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+};
 
 // Estadísticas
 exports.obtenerEstadisticas = (req, res) => {
@@ -334,27 +355,6 @@ exports.obtenerProduccionUsuarios = (req, res) => {
         FROM Producción p
         JOIN Usuarios u ON u.id = p.id_usuario
         JOIN Productos pr ON pr.id = p.id_producto;
-    `;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(rows);
-    });
-};
-
-exports.obtenerResumenUsuarios = (req, res) => {
-    const query = `
-        SELECT 
-            u.id AS id_usuario,
-            u.nombre AS nombre_usuario,
-            u.rol AS rol_usuario,
-            u.fecha_creacion,
-            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'ingreso'), 'N/A') AS ultimo_ingreso,
-            COALESCE((SELECT MAX(r.fecha_hora) FROM Registro r WHERE r.id_usuario = u.id AND r.tipo = 'salida'), 'N/A') AS ultima_salida,
-            COALESCE((SELECT SUM(v.total) FROM Ventas v WHERE v.id_usuario = u.id), 0) AS suma_ventas
-        FROM Usuarios u;
     `;
 
     db.all(query, [], (err, rows) => {

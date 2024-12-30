@@ -4,7 +4,7 @@
     "description": "Aplicación para gestión de empleados y producción",
     "main": "backend/server.js",
     "scripts": {
-        "start": "node backend/server.js",
+        "start": "nodemon backend/server.js",
         "test": "mocha --timeout 10000 test/*.mjs"
     },
     "dependencies": {
@@ -13,6 +13,8 @@
         "express": "^4.18.2",
         "mocha": "^11.0.1",
         "node-fetch": "^3.3.2",
+        "nodemon": "^3.1.9",
+        "sqlite": "^5.1.1",
         "sqlite3": "^5.1.7"
     }
 }

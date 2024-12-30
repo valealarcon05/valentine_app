@@ -1,123 +1,149 @@
-# frontendstatic
+Valentine Cocina Application
 
-1. Base de Datos
-Uso SQLite. Se diseñaron las siguientes tablas:
+Introducción
 
-Usuarios:
+Valentine Cocina es una aplicación diseñada para registrar el inventario de actividades de los empleados, incluyendo producción, ventas y el uso de materia prima. Además, proporciona un panel de administración para que los dueños gestionen usuarios, productos y consultas sobre el rendimiento.
 
-id (Primaria)
-nombre
-rol (empleado/dueño)
-contraseña (para los dueños)
-Productos:
+Requisitos Previos
 
-id (Primaria)
-nombre
-precio_unitario
-sector (congelados/cantina/parrilla)
-Producción:
+Antes de comenzar, asegúrese de tener instalado lo siguiente:
 
-id (Primaria)
-id_usuario (Relación con Usuarios)
-id_producto (Relación con Productos)
-cantidad
-fecha
-MateriaPrima:
+Node.js (versión 14 o superior): Descargar Node.js
 
-id (Primaria)
-nombre
-precio
-cantidad_ingresada
-fecha
-Registro:
+SQLite: Descargar SQLite
 
-id (Primaria)
-id_usuario (Relación con Usuarios)
-tipo (ingreso/salida)
-fecha_hora
+Instalación
 
-2. Back-End
-Uso Node.js con Express.js:
+Siga estos pasos para configurar el entorno:
 
-Endpoints
-Usuarios:
+Clone el repositorio:
 
-Crear, editar y eliminar usuarios (disponible solo para el dueño).
-Autenticación: /login (para el dueño).
-Productos:
+git clone https://github.com/usuario/valentine_cocina.git
+cd valentine_cocina
 
-CRUD (Crear, Leer, Actualizar, Borrar productos).
-Producción:
+Instale las dependencias:
 
-Registrar productos fabricados por los empleados.
-Consultar producción por usuario y fecha (filtrado por empleado o todos para el dueño).
-Materia Prima:
+npm install
 
-Registrar, editar, y consultar materia prima ingresada.
-Comparar rendimientos (venta vs materia prima).
-Estadísticas:
+Configure la base de datos:
 
-Rendimiento por producto (20-25%).
-Ingresos por sector.
-Verificación de uso de materia prima.
+El archivo SQLite ya está configurado en backend/db/empresa.db. Si necesita inicializar nuevamente las tablas, utilice el script en models.js.
 
-3. Front-End
-Uso HTML, CSS, y JavaScript (con React.js o vanilla JavaScript para simplicidad).
+Ejecute el servidor:
 
-Pantallas
-Inicio:
+node backend/server.js
 
-Entrada de ID para empleados.
-Botón para que el dueño acceda al inicio de sesión.
-Dashboard de Empleados:
+La aplicación estará disponible en http://localhost:3000.
 
-Mostrar:
-Producción registrada por el empleado.
-Botón para agregar productos fabricados.
-Botón para cerrar sesión.
-Dashboard del Dueño:
+Configuración del Backend
 
-Mostrar:
-Estadísticas (gráficas y tablas):
-Rendimiento de productos.
-Ingresos por sector.
-Tablas de producción por usuario.
-Botones para gestionar usuarios, productos y materia prima.
+Estructura de Archivos
 
-4. Diseño del Servidor
-El servidor estará configurado para soportar al menos 10 conexiones simultáneas (3 empleados por turno y el dueño).
+/backend/routes/routes.js: Define las rutas de la API.
 
-Configuración
-Express.js: Crear API REST para manejar el CRUD.
-Middleware: Usar autenticación básica (por ejemplo, JWT para el dueño).
-Rutas protegidas: Limitar acceso a datos sensibles al dueño.
+/backend/controllers/api.js: Controladores para gestionar la lógica del backend.
 
-2. Configurar el Frontend
-index.html: Configura el formulario para que los usuarios puedan ingresar o acceder como administrador.
-Implementa los fetch API para interactuar con las rutas /api/login y /api/usuarios.
-Dashboard-admin.html: 
-Mostrar estadísticas, tablas de usuarios, productos, producción, ventas y materia prima.
-Agregar botones o formularios para realizar operaciones de CRUD.
-Dashboard-user.html:
-Mostrar producción y ventas registradas.
-Agregar formularios para registrar nuevas producciones o ventas.
+/backend/models/models.js: Configuración de las tablas y triggers de SQLite.
 
-3. Pruebas Completas
-Realiza pruebas funcionales:
-Verifica que los usuarios puedan iniciar sesión y realizar las acciones permitidas.
-Comprueba que los datos enviados desde el frontend sean manejados correctamente por el backend.
-Asegúrate de que las respuestas del backend actualicen dinámicamente las tablas en el frontend.
+/backend/server.js: Configuración del servidor Express.
 
-4. ¿Qué más se puede mejorar?
-Si todo funciona correctamente, puedes:
-Agregar autenticación JWT para proteger las rutas.
-Crear un script de inicialización de base de datos para automatizar la creación de tablas.
-Implementar pruebas automatizadas con Mocha y Chai. (a medio hacer, verificar esto)
+Rutas de la API
 
-21/12/24: hice hasta insomnia, queda arreglar 3 solicitudes:
-editar producto y materia prima error 404 bad request y para consultar ventas por usuario errpr 500 internal server error
-22/12/24:
-arreglar lo de insomnia, intentè hacer por api.test.mjs con mocha y chai pero se complica, asi que verificarè los 3 solicitudes q faltancc con insomnia. las pude solucionar
-23/12/24:
-prueba de curl /api/productos/1 y usuarios, falta comprobar
-24/12/24: se comprobaron pero no dieron
+Usuarios
+
+Crear usuario: POST /api/usuarios
+
+Listar usuarios: GET /api/usuarios
+
+Editar usuario: PUT /api/usuarios/:id
+
+Eliminar usuario: DELETE /api/usuarios/:id
+
+Productos
+
+Crear producto: POST /api/productos
+
+Listar productos: GET /api/productos
+
+Editar producto: PUT /api/productos/:id
+
+Eliminar producto: DELETE /api/productos/:id
+
+Producción
+
+Registrar producción: POST /api/produccion
+
+Consultar producción general: GET /api/produccion
+
+Consultar producción por empleado: GET /api/produccion/:id
+
+Ventas
+
+Registrar venta: POST /api/ventas
+
+Consultar ventas por empleado: GET /api/ventas/:id
+
+Consultar todas las ventas: GET /api/ventas
+
+Materia Prima
+
+Registrar materia prima: POST /api/materia-prima
+
+Consultar materia prima: GET /api/materia-prima
+
+Estadísticas
+
+Obtener rendimiento: GET /api/estadisticas
+
+Obtener ingresos: GET /api/ingresos
+
+Configuración del Frontend
+
+Páginas
+
+index.html: Página principal con formularios de acceso para empleados y dueños.
+
+dashboard-user.html: Panel de empleados con datos de producción y ventas.
+
+dashboard-admin.html: Panel de administración con funcionalidades para gestionar usuarios, productos y consultar estadísticas.
+
+Recursos
+
+CSS: Archivos en frontend/css.
+
+JavaScript: Lógica en frontend/js para interacción con la API.
+
+Ejecución de Pruebas
+
+Las pruebas están implementadas en api.test.mjs usando Mocha y Chai.
+
+Instale Mocha y Chai:
+
+npm install mocha chai chai-http --save-dev
+
+Ejecute las pruebas:
+
+npx mocha backend/tests/api.test.mjs
+
+Documentación de la API
+
+Para documentar y probar la API, puede usar Swagger:
+
+Instale Swagger UI:
+
+npm install swagger-ui-express --save
+
+Configure Swagger en server.js:
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+Cree un archivo swagger.json para definir las rutas y esquemas.
+
+Acceda a la documentación en http://localhost:3000/api-docs.
+
+Contacto
+
+Para soporte, comuníquese con el desarrollador al correo em.cn.alarcon.valentina@gmail.com
