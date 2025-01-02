@@ -1,12 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const apiController = require('../controllers/api');
+import* as apiController from '../controllers/api.js';
 
 // Producción
 router.post('/api/produccion', apiController.crearProduccion);
 router.get('/api/produccion', apiController.obtenerProduccionPorEmpleado);
 router.get('/api/produccion/general', apiController.obtenerProduccionGeneral);
-router.get('/api/produccion/:id',apiController.obtenerProduccionUsuarios);
+router.get('/api/produccion/:id', apiController.obtenerProduccionUsuarios);
 
 // Ventas
 router.post('/api/ventas', apiController.crearVenta);
@@ -18,7 +18,7 @@ router.post('/api/usuarios', apiController.crearUsuario);
 router.get('/api/usuarios', apiController.listarUsuarios);
 router.put('/api/usuarios/:id', apiController.editarUsuario);
 router.delete('/api/usuarios/:id', apiController.eliminarUsuario);
-router.post('/api/usuarios/verificar-admin', apiController.verificarAdmin);
+router.post('/api/usuarios/login', apiController.verificarAdmin);
 router.get('/api/usuarios/resumen', apiController.obtenerResumenUsuarios);
 
 // Estadísticas
@@ -36,5 +36,6 @@ router.delete('/api/productos/:id', apiController.eliminarProducto);
 router.post('/api/materia-prima', apiController.crearMateriaPrima);
 router.get('/api/materia-prima', apiController.listarMateriaPrima);
 router.put('/api/materia-prima/:id', apiController.editarMateriaPrima);
+router.delete('/api/materia-prima/:id', apiController.eliminarMateriaPrima);
 
-module.exports = router;
+export default router;

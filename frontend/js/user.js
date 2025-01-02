@@ -20,6 +20,7 @@ document.getElementById("btnAgregarProduccion").addEventListener("click", () => 
                                 <option value="congelados">Congelados</option>
                                 <option value="cantina">Cantina</option>
                                 <option value="parrilla">Parrilla</option>
+                                <option value="kiosko">Kiosko</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -99,6 +100,15 @@ document.getElementById("btnAgregarVenta").addEventListener("click", () => {
                 </div>
                 <div class="modal-body">
                     <form id="formVenta">
+                        <div class="mb-3">
+                        <label for="sectorProduccion" class="form-label">Sector:</label>
+                            <select id="sectorProduccion" class="form-select">
+                                <option value="congelados">Congelados</option>
+                                <option value="cantina">Cantina</option>
+                                <option value="parrilla">Parrilla</option>
+                                <option value="kiosko">Kiosko</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label for="productoVenta" class="form-label">Producto:</label>
                             <select id="productoVenta" class="form-select">

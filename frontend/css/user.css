@@ -14,3 +14,30 @@ body{
 .btn {
     margin: 5px;
 }
+
+/* Estilo para tablas responsivas */
+.table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.table th, .table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+@media screen and (max-width: 768px) {
+    .table th, .table td {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+}

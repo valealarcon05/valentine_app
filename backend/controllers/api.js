@@ -1,18 +1,20 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const open = require('sqlite');
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Generar una ruta absoluta
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const dbPath = path.join(__dirname, '../db/empresa.db');
 const db = new sqlite3.Database(dbPath);
 
 // Producción
-exports.crearProduccion = (req, res) => {
+export const crearProduccion = (req, res) => {
     const { id_usuario, id_producto, cantidad, fecha, sector } = req.body;
     if (!id_usuario || !id_producto || !cantidad) {
-    return res.status(400).json({ error: "Faltan campos obligatorios: id_usuario, id_producto o cantidad." });
-}
-    const query = `INSERT INTO Producción (id_usuario, id_producto, cantidad, fecha, sector) VALUES (?, ?, ?, ?)`;
+        return res.status(400).json({ error: "Faltan campos obligatorios: id_usuario, id_producto o cantidad." });
+    }
+    const query = `INSERT INTO Producción (id_usuario, id_producto, cantidad, fecha, sector) VALUES (?, ?, ?, ?, ?)`;
     db.run(query, [id_usuario, id_producto, cantidad, fecha, sector], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -21,7 +23,7 @@ exports.crearProduccion = (req, res) => {
     });
 };
 
-exports.obtenerProduccionPorEmpleado = (req, res) => {
+export const obtenerProduccionPorEmpleado = (_req, res) => {
     const query = `
         SELECT 
             Producción.id_usuario,
@@ -43,7 +45,7 @@ exports.obtenerProduccionPorEmpleado = (req, res) => {
     });
 };
 
-exports.obtenerProduccionGeneral = (req, res) => {
+export const obtenerProduccionGeneral = (_req, res) => {
     const query = `SELECT * FROM Producción`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -53,11 +55,34 @@ exports.obtenerProduccionGeneral = (req, res) => {
     });
 };
 
+export const obtenerProduccionUsuarios = (req, res) => {
+    const { id } = req.params;
+    const query = `
+        SELECT 
+            Producción.id_usuario,
+            Usuarios.nombre AS nombre_usuario,
+            Productos.nombre AS nombre_producto,
+            Producción.cantidad,
+            Producción.fecha,
+            Producción.sector
+        FROM Producción
+        INNER JOIN Productos ON Producción.id_producto = Productos.id
+        INNER JOIN Usuarios ON Producción.id_usuario = Usuarios.id
+        WHERE Producción.id_usuario = ?;
+    `;
+
+    db.all(query, [id], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+};
+
 // Ventas
-exports.crearVenta = (req, res) => {
+export const crearVenta = (req, res) => {
     const { id_usuario, id_producto, cantidad, fecha, sector } = req.body;
 
-    // Validar entrada
     if (!id_usuario || !id_producto || !cantidad || !fecha || !sector) {
         return res.status(400).json({ error: "Todos los campos son obligatorios." });
     }
@@ -75,7 +100,7 @@ exports.crearVenta = (req, res) => {
     });
 };
 
-exports.obtenerVentasGeneral = (req, res) => {
+export const obtenerVentasGeneral = (_req, res) => {
     const query = `SELECT * FROM Ventas`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -85,7 +110,7 @@ exports.obtenerVentasGeneral = (req, res) => {
     });
 };
 
-exports.obtenerVentasPorEmpleado = (req, res) => {
+export const obtenerVentasPorEmpleado = (req, res) => {
     const { id } = req.params;
 
     const query = `
@@ -99,7 +124,7 @@ exports.obtenerVentasPorEmpleado = (req, res) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        if (rows.length) {
+        if (!rows.length) {
             return res.status(404).json({ error: "No se encontraron ventas para este usuario." });
         }
         res.json(rows);
@@ -107,9 +132,8 @@ exports.obtenerVentasPorEmpleado = (req, res) => {
 };
 
 // Usuario
-exports.crearUsuario = (req, res) => {
+export const crearUsuario = (req, res) => {
     const { nombre, rol, contraseña } = req.body;
-
     if (!nombre || !rol || (rol === 'dueño' && !contraseña)) {
         return res.status(400).json({ error: "Todos los campos son obligatorios." });
     }
@@ -123,7 +147,7 @@ exports.crearUsuario = (req, res) => {
     });
 };
 
-exports.listarUsuarios = (req, res) => {
+export const listarUsuarios = (_, res) => {
     const query = `SELECT id, nombre, rol FROM Usuarios`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -133,47 +157,52 @@ exports.listarUsuarios = (req, res) => {
     });
 };
 
-exports.editarUsuario = (req, res) => {
+export const editarUsuario = async (req, res) => {
     const { id } = req.params;
     const { nombre, rol, contraseña } = req.body;
 
-    const query = `UPDATE Usuarios SET nombre = ?, rol = ?, contraseña = ? WHERE id = ?`;
-    db.run(query, [nombre, rol, contraseña, id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ message: 'Usuario actualizado' });
-    });
-};
-
-exports.eliminarUsuario = (req, res) => {
-    const { id } = req.params;
-
-    const query = `DELETE FROM Usuarios WHERE id = ?`;
-    db.run(query, [id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ message: 'Usuario eliminado' });
-    });
-};
-
-exports.verificarAdmin = (req, res) => {
-    const { usuario, contraseña } = req.body;
-
-    // Simulación de credenciales válidas
-    const credencialesValidas = {
-        usuario: "admin",
-        contraseña: "1234",
-    };
-    if (usuario === credencialesValidas.usuario && contraseña === credencialesValidas.contraseña) {
-        res.status(200).json({ message: "Credenciales válidas." });
-    } else {
-        res.status(401).json({ error: "Credenciales incorrectas." });
+    try {
+        await db.run('UPDATE Usuarios SET nombre = ?, sector = ? WHERE id = ?', [nombre, sector, id]);
+        res.status(200).json({ message: 'Usuario actualizado correctamente' });
+    } catch (error) {
+        console.error('Error al editar usuario:', error);
+        res.status(500).json({ message: 'Error al actualizar el usuario' });
     }
 };
 
-exports.obtenerResumenUsuarios = (req, res) => {
+export const eliminarUsuario = async (req, res) => {
+    const { id } = req.params;
+
+try {
+        await db.run('DELETE FROM Usuarios WHERE id = ?', [id]);
+        res.status(200).json({ message: 'Usuario eliminado correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        res.status(500).json({ message: 'Error al eliminar el usuario' });
+    }
+};
+
+export const verificarAdmin = async (req, res) => {
+    const { usuario, contraseña } = req.body;
+
+    try {
+        // Busca el usuario en la base de datos
+        const admin = await db.get('SELECT * FROM Usuarios WHERE nombre = ? AND clave = ? AND role = "admin"', [usuario, contraseña]);
+
+        if (admin) {
+            // Si las credenciales son correctas, retorna un mensaje de éxito
+            res.status(200).json({ message: 'Inicio de sesión exitoso' });
+        } else {
+            // Si no coinciden las credenciales, retorna un error 401
+            res.status(401).json({ message: 'Credenciales incorrectas' });
+        }
+    } catch (error) {
+        console.error('Error al verificar el administrador:', error);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+};
+
+export const obtenerResumenUsuarios = (_req, res) => {
     const query = `
         SELECT 
             u.id AS id_usuario,
@@ -194,9 +223,7 @@ exports.obtenerResumenUsuarios = (req, res) => {
     });
 };
 
-// Estadísticas
-exports.obtenerEstadisticas = (req, res) => {
-    // Simulación de datos: Obtén esto desde la base de datos
+export const obtenerEstadisticas = (_req, res) => {
     const estadisticas = [
         { producto: 'Hamburguesas', rendimiento: 22 },
         { producto: 'Papas Fritas', rendimiento: 24 },
@@ -206,8 +233,7 @@ exports.obtenerEstadisticas = (req, res) => {
     res.json(estadisticas);
 };
 
-exports.obtenerIngresos = (req, res) => {
-    // Simulación de datos de ingresos
+export const obtenerIngresos = (_req, res) => {
     const ingresos = [
         { sector: 'Congelados', total: 5000 },
         { sector: 'Cantina', total: 3000 },
@@ -217,7 +243,7 @@ exports.obtenerIngresos = (req, res) => {
     res.json(ingresos);
 };
 
-exports.calcularRendimiento = (req, res) => {
+export const calcularRendimiento = (_req, res) => {
     const query = `
         SELECT 
             Productos.nombre AS producto,
@@ -248,9 +274,8 @@ exports.calcularRendimiento = (req, res) => {
     });
 };
 
-
-// Crear Producto
-exports.crearProducto = (req, res) => {
+// Productos
+export const crearProducto = (req, res) => {
     const { nombre, precio, sector } = req.body;
 
     if (!nombre || !precio || !sector) {
@@ -266,7 +291,7 @@ exports.crearProducto = (req, res) => {
     });
 };
 
-exports.listarProductos = (req, res) => {
+export const listarProductos = (_req, res) => {
     const query = `SELECT * FROM Productos`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -276,12 +301,9 @@ exports.listarProductos = (req, res) => {
     });
 };
 
-exports.editarProducto = (req, res) => {
+export const editarProducto = (req, res) => {
     const { id } = req.params;
     const { nombre, precio, sector } = req.body;
-    //if (!nombre || !precio || !sector) {
-    //    return res.status(400).json({ error: "Todos los campos (nombre, precio, sector) son obligatorios." });
-    //}
 
     const query = `UPDATE Productos SET nombre = ?, precio_unitario = ?, sector = ? WHERE id = ?`;
     db.run(query, [nombre, precio, sector, id], function (err) {
@@ -292,7 +314,7 @@ exports.editarProducto = (req, res) => {
     });
 };
 
-exports.eliminarProducto = (req, res) => {
+export const eliminarProducto = (req, res) => {
     const { id } = req.params;
 
     const query = `DELETE FROM Productos WHERE id = ?`;
@@ -305,10 +327,10 @@ exports.eliminarProducto = (req, res) => {
 };
 
 // Materia Prima
-exports.crearMateriaPrima = (req, res) => {
+export const crearMateriaPrima = (req, res) => {
     const { nombre, precio, cantidad } = req.body;
     const query = `INSERT INTO MateriaPrima (nombre, precio, cantidad_ingresada, fecha) VALUES (?, ?, ?, ?)`;
-    const fecha = new Date().toISOString().split('T')[0]; // Fecha actual
+    const fecha = new Date().toISOString().split('T')[0];
     db.run(query, [nombre, precio, cantidad, fecha], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -317,7 +339,7 @@ exports.crearMateriaPrima = (req, res) => {
     });
 };
 
-exports.listarMateriaPrima = (req, res) => {
+export const listarMateriaPrima = (_req, res) => {
     const query = `SELECT * FROM MateriaPrima`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -327,12 +349,9 @@ exports.listarMateriaPrima = (req, res) => {
     });
 };
 
-exports.editarMateriaPrima = (req, res) => {
+export const editarMateriaPrima = (req, res) => {
     const { id } = req.params;
     const { nombre, precio, cantidad } = req.body;
-    if (!nombre || !precio || !cantidad) {
-        return res.status(400).json({ error: "Todos los campos (nombre, precio, cantidad) son obligatorios." });
-    }
 
     const query = `UPDATE MateriaPrima SET nombre = ?, precio = ?, cantidad_ingresada = ? WHERE id = ?`;
     db.run(query, [nombre, precio, cantidad, id], function (err) {
@@ -340,27 +359,5 @@ exports.editarMateriaPrima = (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         res.json({ message: 'Materia prima actualizada' });
-    });
-};
-
-exports.obtenerProduccionUsuarios = (req, res) => {
-    const query = `
-        SELECT 
-            p.id_usuario,
-            u.nombre AS nombre_usuario,
-            pr.nombre AS nombre_producto,
-            p.fecha,
-            p.cantidad,
-            p.sector
-        FROM Producción p
-        JOIN Usuarios u ON u.id = p.id_usuario
-        JOIN Productos pr ON pr.id = p.id_producto;
-    `;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(rows);
     });
 };
