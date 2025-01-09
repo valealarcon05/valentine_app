@@ -131,15 +131,39 @@ export const obtenerVentasPorEmpleado = (req, res) => {
     });
 };
 
+export const obtenerDetallesVentas = async (req, res) => {
+    try {
+        const ventas = await db.all(`
+            SELECT 
+                Ventas.id AS id_venta,
+                Productos.nombre AS producto,
+                Ventas.cantidad,
+                Ventas.fecha,
+                Ventas.sector,
+                Ventas.metodo_pago,
+                Productos.precio_compra,
+                Productos.precio_venta
+            FROM Ventas
+            INNER JOIN Productos ON Ventas.id_producto = Productos.id
+        `);
+
+        res.status(200).json(ventas);
+    } catch (error) {
+        console.error('Error al obtener detalles de ventas:', error);
+        res.status(500).json({ message: 'Error al obtener detalles de ventas' });
+    }
+};
+
+
 // Usuario
 export const crearUsuario = (req, res) => {
-    const { nombre, rol, contraseña } = req.body;
-    if (!nombre || !rol || (rol === 'dueño' && !contraseña)) {
+    const { nombre, role, clave } = req.body;
+    if (!nombre || !role || (role === 'dueño' && !clave)) {
         return res.status(400).json({ error: "Todos los campos son obligatorios." });
     }
 
     const query = `INSERT INTO Usuarios (nombre, rol, contraseña) VALUES (?, ?, ?)`;
-    db.run(query, [nombre, rol, contraseña || null], function (err) {
+    db.run(query, [nombre, role, clave || null], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -148,7 +172,7 @@ export const crearUsuario = (req, res) => {
 };
 
 export const listarUsuarios = (_, res) => {
-    const query = `SELECT id, nombre, rol FROM Usuarios`;
+    const query = `SELECT id, nombre, role FROM Usuarios`;
     db.all(query, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -159,7 +183,7 @@ export const listarUsuarios = (_, res) => {
 
 export const editarUsuario = async (req, res) => {
     const { id } = req.params;
-    const { nombre, rol, contraseña } = req.body;
+    const { nombre, role, clave } = req.body;
 
     try {
         await db.run('UPDATE Usuarios SET nombre = ?, sector = ? WHERE id = ?', [nombre, sector, id]);
@@ -183,11 +207,14 @@ try {
 };
 
 export const verificarAdmin = async (req, res) => {
-    const { usuario, contraseña } = req.body;
+    const { usuario, clave } = req.body;
 
     try {
         // Busca el usuario en la base de datos
-        const admin = await db.get('SELECT * FROM Usuarios WHERE nombre = ? AND clave = ? AND role = "admin"', [usuario, contraseña]);
+        const admin = await db.get('SELECT * FROM Usuarios WHERE nombre = ? AND clave = ? AND role = "admin"', [
+            usuario, 
+            clave,
+        ]);
 
         if (admin) {
             // Si las credenciales son correctas, retorna un mensaje de éxito
@@ -359,5 +386,17 @@ export const editarMateriaPrima = (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         res.json({ message: 'Materia prima actualizada' });
+    });
+};
+
+export const eliminarMateriaPrima = (req, res) => {
+    const { id } = req.params;
+
+    const query = `DELETE FROM MateriaPrima WHERE id = ?`;
+    db.run(query, [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: 'Materia Prima eliminado' });
     });
 };

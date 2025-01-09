@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import* as apiController from '../controllers/api.js';
+import * as apiController from '../controllers/api.js';
 
 // Producción
 router.post('/api/produccion', apiController.crearProduccion);
@@ -12,13 +12,15 @@ router.get('/api/produccion/:id', apiController.obtenerProduccionUsuarios);
 router.post('/api/ventas', apiController.crearVenta);
 router.get('/api/ventas', apiController.obtenerVentasGeneral);
 router.get('/api/ventas/:id', apiController.obtenerVentasPorEmpleado);
+router.get('/api/ventas/detalles', apiController.obtenerDetallesVentas);
+
 
 // Usuarios
 router.post('/api/usuarios', apiController.crearUsuario);
 router.get('/api/usuarios', apiController.listarUsuarios);
 router.put('/api/usuarios/:id', apiController.editarUsuario);
 router.delete('/api/usuarios/:id', apiController.eliminarUsuario);
-router.post('/api/usuarios/login', apiController.verificarAdmin);
+router.post('/api/usuarios/verificar-admin', apiController.verificarAdmin);
 router.get('/api/usuarios/resumen', apiController.obtenerResumenUsuarios);
 
 // Estadísticas

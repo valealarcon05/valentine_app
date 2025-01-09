@@ -126,6 +126,16 @@ document.getElementById("btnAgregarVenta").addEventListener("click", () => {
                                 <option value="congelados">Congelados</option>
                                 <option value="cantina">Cantina</option>
                                 <option value="parrilla">Parrilla</option>
+                                <option value="kiosko">Kiosko</option>
+                            </select>
+                        </div>
+                        <div class="mb=3">
+                        <labell for="metodoVenta" class="form-label">Método de pago:</label>
+                        <select id="metodoVenta" class="form-select">
+                                <option value="1">Billetera virtual</option>
+                                <option value="2">Efectivo</option>
+                                <option value="3">Tarjeta Credito</option>
+                                <option value="4">Tarjeta Debito</option>
                             </select>
                         </div>
                         <div class="modal-footer">
